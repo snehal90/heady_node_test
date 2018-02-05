@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 
 global.CONFIG = require('./config/env_config')();
 var db_file = require('./config/db');
-db = db_file.connectToServer();
+db = db_file.connectToServer();				//make db connection
 var category = require('./routes/category');
 
 var app = express();
