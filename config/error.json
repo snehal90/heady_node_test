@@ -1,0 +1,62 @@
+{
+    "error_400" : {
+        "invalid_params" : {
+            "error_code"     :   "invalid_params",
+            "responseHeaders": { "status" : 400 },
+            "responseParams" : {
+                                    "status" : "error",
+                                    "message": "Invalid request parameters",
+                                    "error_code"     :   "invalid_params"
+                               }
+        },
+        "category_not_exists" : {
+            "error_code"      :  "category_not_exists",
+            "responseHeaders" : { "status" : 400},
+            "responseParams"  : {
+                    "status" : "error",
+                    "message": "Category doesnt exists.",
+                    "error_code"      :  "category_not_exists"
+                }
+        },
+        "product_exists" : {
+            "error_code"      :  "product_exists",
+            "responseHeaders" : { "status" : 400},
+            "responseParams"  : {
+                    "status" : "error",
+                    "message": "Product SKU already exists exists.",
+                    "error_code"      :  "product_exists"
+                }
+        }
+    },
+    "error_403" : {
+        "server_error" : {
+            "error_code"     :   "server_error",
+            "responseHeaders": {"status" : 403},
+            "responseParams" : {
+                                    "status" : "error",
+                                    "message": "Unable to process request",
+                                    "error_code"     :   "server_error"
+                               }
+        }
+    },
+    "error_200" : {
+        "no_result" : {
+            "error_code"     :   "no_result",
+            "responseHeaders":  { "status" : 200 },
+            "responseParams" :  {
+                                    "status" : "error",
+                                    "message": "No result found!!!",
+                                    "error_code"     :   "no_result"
+                                }
+        },
+        "success" : {
+            "error_code"     :   "success",
+            "responseHeaders":  { "status" : 200 },
+            "responseParams" :  {
+                                    "status" : "success",
+                                    "message": "Operation performed successfully",
+                                    "error_code"     :   "success"
+                                }
+        }
+    }
+}
