@@ -20,4 +20,16 @@ router.post('/', function(req, res) {
   }, req.body);
 });
 
+/* Get all categories
+ * fetch all categories with child category
+ */
+router.get('/', function(req, res) {
+  category.getAllCategories(function(err, res_data) {
+    if(err) {
+      return res.status(err.responseHeaders.status).send(err.responseParams);
+    }
+    res.status(res_data.responseHeaders.status).send(res_data.responseParams);
+  }, req.query);
+});
+
 module.exports = router;

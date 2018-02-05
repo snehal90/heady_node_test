@@ -79,8 +79,10 @@ exports.addCategory = function(callback, data) {
 }
 
 //get category by passing condition
-function getCategoryByCondition(callback, cond) {
-  category.find(cond, {}).toArray(function(err, cat_data) {
+function getCategoryByCondition(callback, cond, limit, offset) {
+  limit = limit == undefined || isNaN(limit) || limit <= 0 ? 20 : parseInt(limit, 10);
+  offset = offset == undefined || isNaN(offset) || offset <= 0 ? 0 : (parseInt(offset, 10) * limit);
+  category.find(cond, {}).limit(limit).skip(offset).toArray(function(err, cat_data) {
     if(err) {
       var error = errorCodes.error_403.server_error;
       callback(error);
@@ -110,4 +112,20 @@ function save(callback, data, is_update) {
       callback(null, result_response);
     });
   }
+}
+
+//Get all categories with child categories
+exports.getAllCategories = function(callback, data) {
+  var limit = data['limit'] != undefined ? data['limit'] : 20;
+  var offset = data['offset'] != undefined ? data['offset'] : 0;
+  getCategoryByCondition(function(err, cat_data) {
+    if(err) {
+      callback(err);
+    }
+    var result_response = errorCodes.error_200.success;
+    delete result_response.responseParams.error_code;
+    delete result_response.responseParams.message;
+    result_response.responseParams.data = cat_data;
+    callback(null, result_response);
+  }, {}, limit, offset);
 }
