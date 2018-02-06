@@ -31,4 +31,18 @@ router.get('/', function(req, res) {
   }, req.query);
 });
 
+/* update product by id
+ * params:
+ *    product_id : product id - mandatory
+ */
+router.put('/:product_id', function(req, res) {
+  var product_id = req.params.product_id;
+  product.updateProductById(function(err, res_data) {
+    if(err) {
+      return res.status(err.responseHeaders.status).send(err.responseParams);
+    }
+    res.status(res_data.responseHeaders.status).send(res_data.responseParams);
+  }, product_id, req.body);
+});
+
 module.exports = router;

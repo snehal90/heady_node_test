@@ -26,6 +26,7 @@ exports.addProduct = function(callback, data) {
   var checkit_rule = new checkit(rules);
   //validation check
   checkit_rule.run(data).then(function() {
+    data.id = new Date().getTime();
     var product_data = {'insert_data' : data};
 
     //insert new product
@@ -51,8 +52,8 @@ function saveProduct(callback, data, is_update) {
         var error = errorCodes.error_403.server_error;
         callback(error);
       }
-      var result_response = errorCodes.error_200.success;
-      callback(null, result_response);
+      var update_response = errorCodes.error_200.success;
+      callback(null, update_response);
     });
   } else {
     products.save(data['insert_data'], function(err, insert_ret_data) {
@@ -60,8 +61,8 @@ function saveProduct(callback, data, is_update) {
         var error = errorCodes.error_403.server_error;
         callback(error);
       }
-      var result_response = errorCodes.error_200.success;
-      callback(null, result_response);
+      var add_response = errorCodes.error_200.success;
+      callback(null, add_response);
     });
   }
 }
@@ -100,17 +101,70 @@ exports.getProductsByCategory = function(callback, data) {
         callback(err);
       }
 
-      var result_response;
+      var get_response = {};
       if(ret_data.length == 0) {
-        result_response = errorCodes.error_200.no_result;
+        get_response = errorCodes.error_200.no_result;
       } else {
-        result_response = errorCodes.error_200.success;
-        delete result_response.responseParams.message;
+        get_response = errorCodes.error_200.success;
+        delete get_response.responseParams.message;
       }
-      delete result_response.responseParams.error_code;
-      result_response.responseParams.data = ret_data;
-      callback(null, result_response);
+      delete get_response.responseParams.error_code;
+      get_response.responseParams.data = ret_data;
+      callback(null, get_response);
     }, cond, limit, offset);
+  }).catch(checkit.Error, function(err) {
+    var error = errorCodes.error_400.invalid_params;
+    error.responseParams.message = err.toJSON();
+    callback(error);
+  })
+}
+
+//update product by id
+exports.updateProductById = function(callback, product_id, data) {
+  var rules = {
+    product_id : {
+      rule : 'required',
+      message : 'Please provide product id'
+    }
+  };
+
+  var checkit_rule = new checkit(rules);
+  //validation check
+  checkit_rule.run({'product_id' : product_id}).then(function() {
+    var cond = {'id' : parseInt(product_id)};
+    //check whether product exists or no
+    getProductsByCondition(function(err, prod_data) {
+      if(err) {
+        callback(err);
+      }
+
+      if(prod_data.length == 0) {
+        var prod_response = errorCodes.error_200.no_result;
+        delete prod_response.responseParams.error_code;
+        prod_response.responseParams.status = 'error';
+        prod_response.responseParams.message = 'Product not found';
+        callback(null, prod_response);
+      }
+
+      if(data['sku'] !== undefined) {
+        delete data['sku'];
+      }
+      if(data['id'] !== undefined) {
+        delete data['id'];
+      }
+      var update_data = data;
+      var product_update = {};
+      product_update['cond'] = cond;
+      product_update['update_cond'] = {'$set' : update_data};
+
+      saveProduct(function(err, res_dt) {
+        if(err) {
+          callback(err);
+        }
+        callback(null, res_dt);
+      }, product_update, 1);
+
+    }, cond);
   }).catch(checkit.Error, function(err) {
     var error = errorCodes.error_400.invalid_params;
     error.responseParams.message = err.toJSON();
