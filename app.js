@@ -9,6 +9,7 @@ global.CONFIG = require('./config/env_config')();
 var db_file = require('./config/db');
 db = db_file.connectToServer();				//make db connection
 var category = require('./routes/category');
+var product = require('./routes/products');
 
 var app = express();
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 
 //map category routes
 app.use('/category', category);
+app.use('/product', product);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
