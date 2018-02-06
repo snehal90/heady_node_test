@@ -65,3 +65,55 @@ function saveProduct(callback, data, is_update) {
     });
   }
 }
+
+//get products by passing condition
+function getProductsByCondition(callback, cond, limit, offset) {
+  limit = limit == undefined || isNaN(limit) || limit <= 0 ? 20 : parseInt(limit, 10);
+  offset = offset == undefined || isNaN(offset) || offset <= 0 ? 0 : (parseInt(offset, 10) * limit);
+  products.find(cond, {}).limit(limit).skip(offset).toArray(function(err, cat_data) {
+    if(err) {
+      var error = errorCodes.error_403.server_error;
+      callback(error);
+    }
+    callback(null, cat_data);
+  });
+}
+
+//get products by category
+exports.getProductsByCategory = function(callback, data) {
+  var rules = {
+    category : {
+      rule : 'required',
+      message : 'Please provide category id'
+    }
+  };
+
+  var checkit_rule = new checkit(rules);
+  //validation check
+  checkit_rule.run(data).then(function() {
+    var cond = {};
+    var limit = data['limit'] != undefined ? data['limit'] : 20;
+    var offset = data['offset'] != undefined ? data['offset'] : 0;
+    cond['categories'] = parseInt(data['category']);
+    getProductsByCondition(function(err, ret_data) {
+      if(err) {
+        callback(err);
+      }
+
+      var result_response;
+      if(ret_data.length == 0) {
+        result_response = errorCodes.error_200.no_result;
+      } else {
+        result_response = errorCodes.error_200.success;
+        delete result_response.responseParams.message;
+      }
+      delete result_response.responseParams.error_code;
+      result_response.responseParams.data = ret_data;
+      callback(null, result_response);
+    }, cond, limit, offset);
+  }).catch(checkit.Error, function(err) {
+    var error = errorCodes.error_400.invalid_params;
+    error.responseParams.message = err.toJSON();
+    callback(error);
+  })
+}

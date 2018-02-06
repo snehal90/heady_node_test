@@ -44,7 +44,7 @@
             "error_code"     :   "no_result",
             "responseHeaders":  { "status" : 200 },
             "responseParams" :  {
-                                    "status" : "error",
+                                    "status" : "success",
                                     "message": "No result found!!!",
                                     "error_code"     :   "no_result"
                                 }
